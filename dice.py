@@ -1,6 +1,6 @@
 import random
 
-class Dict:
+class Dice:
     def __init__(self, sides):
         self.sides = sides
 
@@ -11,6 +11,6 @@ class Dict:
         return [self.roll() for _ in range(times)]
 
 
-standard_dice = Dict(6)
+standard_dice = Dice(6)
 print(standard_dice.roll_multiple(6))
 
