@@ -1,3 +1,4 @@
-# Internalizing OOP
+# Bank Account Simulator
 
-OOP is the reason for all my troubles. And across time, I have made numerous efforts to learn it and yet I have failed every single time. It has always been more ceremony then substance. Giving it my last try, this time by solely building small toy project.
+**Goal**: Learn state management inside objects, data hiding, and validation.
+**Core OOP concepts covered**: Encapsulation, properties (@property), private attributes (_balance), simple validation logic.
