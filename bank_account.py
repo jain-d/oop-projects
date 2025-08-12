@@ -1,3 +1,17 @@
+class Amount:
+    def __init__(self, amount):
+        try:
+            self.__amount = int(amount)
+        except ValueError:
+            raise Exception("Numeral Value expected")
+
+        if self.__amount <= 0:
+            raise Exception("Incorrect Amount")
+
+    @property
+    def amount(self):
+        return self.__amount
+
 class BankAccount:
     def __init__(self, name, account_number, balance):
         self.name = name
@@ -8,19 +22,14 @@ class BankAccount:
     def balance(self):
         return self.__balance
 
-    @balance.setter
-    def balance(self, amount):
-        self.__balance += amount
-
-    def deposit(self, amount):
-        if amount <= 0:
-            raise Exception("Incorrect Deposit Amount")
-        else:
-            self.balance = amount
+    def deposit(self, amount: int):
+        deposit_amount = Amount(amount)
+        self.__balance += deposit_amount.amount
 
     def withdraw(self, amount):
-        if amount <= self.balance:
-            self.balance = -amount
+        withdrawal_amount = Amount(amount)
+        if withdrawal_amount.amount <= self.balance:
+            self.__balance -= withdrawal_amount.amount
         else:
             raise Exception("Insufficient Balance")
 
