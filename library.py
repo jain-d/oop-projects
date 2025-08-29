@@ -1,20 +1,73 @@
-from book import Book
+from __future__ import annotations
 from member import Member
+from book import Book
+import json
 
 
 class Library:
     def __init__(self, books: dict[str, Book], members: dict[str, Member]):
-        self._books: dict[str, Book] = books
-        self._members: dict[str, Member] = members
+        self.books: dict[str, Book] = books
+        self.members: dict[str, Member] = members
 
-    def add_book(book: Book):
-        if (title := book.title) in self._books:
-            self._books[title].in_stock += 1
-        else:
-            self._books.update({title: book})
+    def add_book(self, book: Book):
+        if book.title in self.books:
+            self.books[book.title].in_stock += 1
+            return
+        self.books[book.title] = book
 
     def add_member(self, member: Member):
-        if (name := member.name) in self._members:
-            raise ValueError(f"a member named '{name}' already exists.")
-        else:
-            self._members.update({name: member})
+        if member.name in self.members:
+            raise ValueError(f"The member '{member.name}' already exists.")
+        self.members[member.name] = member
+
+    def lend_book(self, title: str, member_name: str):
+        # making sure stock exists
+        if title not in self.books:
+            raise ValueError(f"The book {title} is not in library")
+        elif not self.books[title].in_stock:
+            raise ValueError(f"The book {title} is out of stock")
+        # making sure member exists
+        elif member_name not in self.members:
+            raise ValueError(f"Member not found! no member named '{member_name}' exists")
+        self.members[member_name].borrow_book(title)        # declaring to mark the book borrowed book
+        self.books[title].in_stock -= 1                     # decreasing the stock
+
+    def return_book(self, title: str, member_name: str):
+        if title not in self.books:
+            raise ValueError(f"No records of book '{title}'")
+        elif member_name not in self.members:
+            raise ValueError(f"Member not found! no member named '{member_name}' exists")
+        self.members[member_name].return_book(title)        # declaring to return the book
+        self.books[title].in_stock += 1                     # restocking the book
+
+    def save_to_file(self, filename: str):
+        dict_to_dump: dict = {"books": [], "members": []}
+
+        for book in self.books.values():
+            dict_to_dump["books"].append(book.to_dict())
+
+        for member in self.members.values():
+            dict_to_dump["members"].append(member.to_dict())
+
+        with open(filename, "w") as file:
+            json.dump(dict_to_dump, file)
+
+    @classmethod
+    def load_from_file(cls, filename: str) -> Library:
+        book_list: dict[str, Book] = dict()
+        member_list: dict[str, Member] = dict()
+        # reading file data
+        with open(filename, "r") as file:
+            file_data = json.load(file)
+        # mapping data
+        for data_type, data_list in file_data.items():
+            if data_type == "books":
+                for book in data_list:
+                    book_list.update({book["title"]: Book.from_dict(book)})
+            elif data_type == "members":
+                for member in data_list:
+                    member_list.update({member["name"]: Member.from_dict(member)}) 
+            else:
+                raise ValueError("Found un-mappable data while reading json file")
+        return cls(book_list, member_list)
+
